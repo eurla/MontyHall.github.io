@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>100扇门问题模拟器 - 三门问题极端版</title>
+    <title>三门问题与百门问题模拟器</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -38,6 +38,7 @@
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid #4e54c8;
+            position: relative;
         }
         
         h1 {
@@ -53,6 +54,35 @@
             color: #4e54c8;
         }
         
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .mode-btn {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: rgba(78, 84, 200, 0.3);
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
         .instructions {
             background: rgba(30, 30, 60, 0.8);
             border-radius: 15px;
@@ -64,6 +94,9 @@
         .instructions h2 {
             color: #ffcc00;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .instructions ul {
@@ -80,6 +113,12 @@
             grid-template-columns: repeat(10, 1fr);
             gap: 12px;
             margin: 30px 0;
+        }
+        
+        .three-doors {
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 600px;
+            margin: 30px auto;
         }
         
         .door {
@@ -264,58 +303,6 @@
             padding: 10px;
         }
         
-        @media (max-width: 768px) {
-            .doors-container {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 8px;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            button {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .stat-box {
-                min-width: 150px;
-            }
-        }
-        
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #4e54c8;
-        }
-        
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            background: rgba(78, 84, 200, 0.3);
-            border-radius: 8px 8px 0 0;
-            margin-right: 5px;
-        }
-        
-        .tab.active {
-            background: rgba(78, 84, 200, 0.8);
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
         .probability-cards {
             display: flex;
             justify-content: space-around;
@@ -347,144 +334,239 @@
             color: #ffcc00;
             margin: 15px 0;
         }
+        
+        @media (max-width: 768px) {
+            .doors-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+            
+            .three-doors {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stat-box {
+                min-width: 150px;
+            }
+            
+            .mode-selector {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .mode-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .probability-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        
+        .mode-description {
+            background: rgba(40, 40, 80, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #4e54c8;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .comparison-table th {
+            background: rgba(78, 84, 200, 0.5);
+            font-size: 1.2rem;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: rgba(30, 30, 60, 0.5);
+        }
+        
+        .comparison-table .highlight-cell {
+            background: rgba(255, 204, 0, 0.2);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-door-open"></i> 100扇门问题模拟器</h1>
-            <div class="subtitle">经典三门问题的极端扩展版本</div>
+            <h1><i class="fas fa-door-open"></i> 三门问题与百门问题模拟器</h1>
+            <div class="subtitle">探索概率论中最违反直觉的悖论</div>
+            
+            <div class="mode-selector">
+                <button class="mode-btn active" id="threeDoorsBtn">
+                    <i class="fas fa-door-closed"></i> 三门问题
+                </button>
+                <button class="mode-btn" id="hundredDoorsBtn">
+                    <i class="fas fa-door-closed"></i> 百门问题
+                </button>
+            </div>
         </header>
         
-        <div class="tabs">
-            <div class="tab active" data-tab="game">游戏</div>
-            <div class="tab" data-tab="explanation">概率解释</div>
-            <div class="tab" data-tab="about">关于</div>
+        <div class="mode-description" id="modeDescription">
+            <h3><i class="fas fa-info-circle"></i> 三门问题模式</h3>
+            <p>经典的三门问题：3扇门中只有1扇有奖品。选择一扇门后，主持人打开一扇空门，然后您决定是否更换选择。</p>
         </div>
         
-        <div class="tab-content active" id="game-tab">
-            <div class="instructions">
-                <h2><i class="fas fa-info-circle"></i> 游戏规则</h2>
-                <ul>
-                    <li>100扇门中只有1扇门后面有奖品</li>
-                    <li>你首先选择一扇你认为有奖品的门</li>
-                    <li>主持人会打开98扇没有奖品的门，只留下你选择的门和另一扇门</li>
-                    <li>你需要决定：<span class="highlight">坚持原来的选择</span> 还是 <span class="highlight">换成另一扇门</span></li>
-                    <li>最后公布你是否中奖并更新统计数据</li>
-                </ul>
-            </div>
-            
-            <div class="game-info">
-                <div id="prizeDoorInfo"><i class="fas fa-gift"></i> 奖品门: ?</div>
-                <div id="playerChoiceInfo"><i class="fas fa-hand-pointer"></i> 你的选择: 未选择</div>
-            </div>
-            
-            <div class="doors-container" id="doors">
-                <!-- 100扇门将由JavaScript生成 -->
-            </div>
-            
-            <div class="controls">
-                <button id="resetBtn"><i class="fas fa-redo"></i> 重新开始游戏</button>
-                <button id="keepBtn" disabled><i class="fas fa-lock"></i> 坚持原选择</button>
-                <button id="swapBtn" disabled><i class="fas fa-exchange-alt"></i> 换成另一扇门</button>
-            </div>
-            
-            <div class="result" id="result">
-                请从上面100扇门中选择一扇开始游戏
-            </div>
-            
-            <div class="stats-container">
-                <div class="stat-box">
-                    <div class="stat-value" id="totalGames">0</div>
-                    <div class="stat-label">总游戏次数</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="keepWins">0</div>
-                    <div class="stat-label">坚持选择获胜</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="swapWins">0</div>
-                    <div class="stat-label">换门获胜</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="keepWinRate">0%</div>
-                    <div class="stat-label">坚持选择胜率</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="swapWinRate">0%</div>
-                    <div class="stat-label">换门胜率</div>
-                </div>
-            </div>
+        <div class="instructions">
+            <h2><i class="fas fa-gamepad"></i> 游戏规则</h2>
+            <ul>
+                <li id="doorCount">3扇门中只有1扇门后面有奖品</li>
+                <li>你首先选择一扇你认为有奖品的门</li>
+                <li id="revealCount">主持人会打开1扇没有奖品的门</li>
+                <li>你需要决定：<span class="highlight">坚持原来的选择</span> 还是 <span class="highlight">换成另一扇门</span></li>
+                <li>最后公布你是否中奖并更新统计数据</li>
+            </ul>
         </div>
         
-        <div class="tab-content" id="explanation-tab">
-            <div class="probability-info">
-                <h2><i class="fas fa-calculator"></i> 概率分析</h2>
-                <p>这个游戏是著名的"三门问题"的扩展版本，它揭示了概率论中一个违反直觉的现象。</p>
-                
-                <div class="probability-cards">
-                    <div class="card">
-                        <h3>初始概率</h3>
-                        <p>当你最初选择一扇门时：</p>
-                        <div class="number">1%</div>
-                        <p>你选中有奖品的概率只有1%，因为总共有100扇门。</p>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>坚持选择</h3>
-                        <p>如果你坚持最初的选择：</p>
-                        <div class="number">1%</div>
-                        <p>获胜概率仍然是1%，因为主持人排除其他门不会改变你最初选择的概率。</p>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>换门</h3>
-                        <p>如果你选择换门：</p>
-                        <div class="number">99%</div>
-                        <p>获胜概率提高到99%，因为最初有99%的概率奖品在其他门中。</p>
-                    </div>
-                </div>
-                
-                <p style="margin-top: 25px; text-align: left; line-height: 1.6;">
-                    <strong>为什么换门的胜率这么高？</strong><br>
-                    当你最初选择一扇门时，只有1%的机会是正确的，而有99%的机会奖品在其他99扇门中。
-                    当主持人排除98扇空门后，剩下的那扇门就包含了99%的概率。换门策略相当于选择了最初99扇门的集合，
-                    而坚持原选择只选择了最初的那一扇门。
-                </p>
+        <div class="game-info">
+            <div id="prizeDoorInfo"><i class="fas fa-gift"></i> 奖品门: ?</div>
+            <div id="playerChoiceInfo"><i class="fas fa-hand-pointer"></i> 你的选择: 未选择</div>
+            <div id="modeStats"><i class="fas fa-chart-bar"></i> 当前模式: 三门问题</div>
+        </div>
+        
+        <div class="doors-container three-doors" id="doors">
+            <!-- 门将由JavaScript生成 -->
+        </div>
+        
+        <div class="controls">
+            <button id="resetBtn"><i class="fas fa-redo"></i> 重新开始游戏</button>
+            <button id="keepBtn" disabled><i class="fas fa-lock"></i> 坚持原选择</button>
+            <button id="swapBtn" disabled><i class="fas fa-exchange-alt"></i> 换成另一扇门</button>
+        </div>
+        
+        <div class="result" id="result">
+            请从上面门中选择一扇开始游戏
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-value" id="totalGames">0</div>
+                <div class="stat-label">总游戏次数</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="keepWins">0</div>
+                <div class="stat-label">坚持选择获胜</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="swapWins">0</div>
+                <div class="stat-label">换门获胜</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="keepWinRate">0%</div>
+                <div class="stat-label">坚持选择胜率</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="swapWinRate">0%</div>
+                <div class="stat-label">换门胜率</div>
             </div>
         </div>
         
-        <div class="tab-content" id="about-tab">
-            <div class="probability-info">
-                <h2><i class="fas fa-question-circle"></i> 关于100扇门问题</h2>
+        <div class="probability-info">
+            <h2><i class="fas fa-calculator"></i> 概率分析</h2>
+            
+            <div class="probability-cards">
+                <div class="card">
+                    <h3>初始概率</h3>
+                    <p>当你最初选择一扇门时：</p>
+                    <div class="number" id="initialProb">33.3%</div>
+                    <p id="initialDesc">你选中有奖品的概率是1/3</p>
+                </div>
                 
-                <div style="text-align: left; line-height: 1.6; margin-top: 20px;">
-                    <p>这个游戏是著名的"蒙提霍尔问题"（Monty Hall problem）的扩展版本。蒙提霍尔问题得名于美国电视游戏节目《Let's Make a Deal》的主持人蒙提·霍尔。</p>
-                    
-                    <p><strong>历史背景：</strong></p>
-                    <p>这个问题最初由统计学家Steve Selvin在1975年提出，引起了广泛争议。1990年，一位读者向《Parade》杂志的"Ask Marilyn"专栏提出了这个问题，Marilyn vos Savant给出了换门的正确解答，但遭到了数千名读者的反对，其中包括许多数学教授。</p>
-                    
-                    <p><strong>数学原理：</strong></p>
-                    <p>100扇门问题通过放大规模使概率差异更加明显：</p>
-                    <ul style="padding-left: 25px; margin: 15px 0;">
-                        <li>初始选择正确的概率：1/100 = 1%</li>
-                        <li>初始选择错误的概率：99/100 = 99%</li>
-                        <li>换门后获胜的概率 = 初始选择错误的概率 = 99%</li>
-                    </ul>
-                    
-                    <p><strong>实际意义：</strong></p>
-                    <p>这个悖论展示了人类直觉在概率问题上的局限性，强调了条件概率的重要性。它在统计学、决策理论和人工智能领域都有应用价值。</p>
-                    
-                    <p style="margin-top: 20px; text-align: center; font-style: italic;">
-                        "概率不是直觉的产物，而是逻辑的产物。"<br>
-                        — 概率论先驱Pierre-Simon Laplace
-                    </p>
+                <div class="card">
+                    <h3>坚持选择</h3>
+                    <p>如果你坚持最初的选择：</p>
+                    <div class="number" id="keepProb">33.3%</div>
+                    <p id="keepDesc">获胜概率保持1/3不变</p>
+                </div>
+                
+                <div class="card">
+                    <h3>换门</h3>
+                    <p>如果你选择换门：</p>
+                    <div class="number" id="swapProb">66.7%</div>
+                    <p id="swapDesc">获胜概率提高到2/3</p>
                 </div>
             </div>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>比较项目</th>
+                        <th>三门问题</th>
+                        <th>百门问题</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>总门数</td>
+                        <td>3</td>
+                        <td>100</td>
+                    </tr>
+                    <tr>
+                        <td>初始获胜概率</td>
+                        <td>1/3 ≈ 33.3%</td>
+                        <td>1/100 = 1%</td>
+                    </tr>
+                    <tr>
+                        <td>主持人排除门数</td>
+                        <td>1</td>
+                        <td>98</td>
+                    </tr>
+                    <tr class="highlight-cell">
+                        <td>坚持选择获胜概率</td>
+                        <td>33.3%</td>
+                        <td>1%</td>
+                    </tr>
+                    <tr class="highlight-cell">
+                        <td>换门获胜概率</td>
+                        <td>66.7%</td>
+                        <td>99%</td>
+                    </tr>
+                    <tr>
+                        <td>换门优势</td>
+                        <td>2倍</td>
+                        <td>99倍</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p style="margin-top: 25px; text-align: left; line-height: 1.6;">
+                <strong>为什么换门的胜率更高？</strong><br>
+                当你最初选择一扇门时，只有很小的机会是正确的（三门问题1/3，百门问题1/100）。
+                当主持人排除空门后，剩下的那扇门就包含了最初所有未被选择的门的概率。
+                换门策略相当于选择了最初未被选择的门的集合，而坚持原选择只选择了最初的那一扇门。
+            </p>
         </div>
         
         <div class="footer">
-            <p>100扇门问题模拟器 | 三门问题极端版 | 设计用于演示概率论原理</p>
+            <p>三门问题与百门问题模拟器 | 设计用于演示概率论原理</p>
             <p>© 2023 概率教育工具</p>
         </div>
     </div>
@@ -498,6 +580,20 @@
             const resultDiv = document.getElementById('result');
             const prizeDoorInfo = document.getElementById('prizeDoorInfo');
             const playerChoiceInfo = document.getElementById('playerChoiceInfo');
+            const threeDoorsBtn = document.getElementById('threeDoorsBtn');
+            const hundredDoorsBtn = document.getElementById('hundredDoorsBtn');
+            const modeDescription = document.getElementById('modeDescription');
+            const doorCountEl = document.getElementById('doorCount');
+            const revealCountEl = document.getElementById('revealCount');
+            const modeStats = document.getElementById('modeStats');
+            
+            // 概率显示元素
+            const initialProb = document.getElementById('initialProb');
+            const keepProb = document.getElementById('keepProb');
+            const swapProb = document.getElementById('swapProb');
+            const initialDesc = document.getElementById('initialDesc');
+            const keepDesc = document.getElementById('keepDesc');
+            const swapDesc = document.getElementById('swapDesc');
             
             // 统计元素
             const totalGamesEl = document.getElementById('totalGames');
@@ -506,18 +602,14 @@
             const keepWinRateEl = document.getElementById('keepWinRate');
             const swapWinRateEl = document.getElementById('swapWinRate');
             
-            // 标签页
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
             // 游戏状态
             let gameState = {
+                mode: 'three', // 'three' 或 'hundred'
                 totalGames: 0,
                 keepWins: 0,
                 swapWins: 0,
                 prizeDoor: 0,
                 playerFirstChoice: null,
-                doors: [],
                 revealedDoors: [],
                 remainingDoor: null
             };
@@ -525,7 +617,8 @@
             // 初始化游戏
             function initGame() {
                 // 重置游戏状态
-                gameState.prizeDoor = Math.floor(Math.random() * 100) + 1;
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
+                gameState.prizeDoor = Math.floor(Math.random() * doorCount) + 1;
                 gameState.playerFirstChoice = null;
                 gameState.revealedDoors = [];
                 gameState.remainingDoor = null;
@@ -533,16 +626,26 @@
                 // 更新界面
                 prizeDoorInfo.textContent = `奖品门: ?`;
                 playerChoiceInfo.textContent = `你的选择: 未选择`;
-                resultDiv.textContent = '请从上面100扇门中选择一扇开始游戏';
+                resultDiv.textContent = '请从上面门中选择一扇开始游戏';
                 resultDiv.className = 'result';
                 
                 // 禁用操作按钮
                 keepBtn.disabled = true;
                 swapBtn.disabled = true;
                 
-                // 创建100扇门
+                // 创建门
+                createDoors(doorCount);
+                
+                // 更新概率显示
+                updateProbabilityDisplay();
+            }
+            
+            // 创建门
+            function createDoors(count) {
                 doorsContainer.innerHTML = '';
-                for (let i = 1; i <= 100; i++) {
+                doorsContainer.className = count === 3 ? 'doors-container three-doors' : 'doors-container';
+                
+                for (let i = 1; i <= count; i++) {
                     const door = document.createElement('div');
                     door.className = 'door';
                     door.textContent = i;
@@ -557,6 +660,7 @@
             function selectDoor(doorId) {
                 if (gameState.playerFirstChoice !== null) return;
                 
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
                 gameState.playerFirstChoice = doorId;
                 playerChoiceInfo.textContent = `你的选择: ${doorId}`;
                 
@@ -567,7 +671,7 @@
                     }
                 });
                 
-                // 主持人操作：打开98扇没有奖品的门
+                // 主持人操作：打开空门
                 revealEmptyDoors();
                 
                 // 启用操作按钮
@@ -577,37 +681,31 @@
             
             // 揭示空门
             function revealEmptyDoors() {
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
+                const revealCount = gameState.mode === 'three' ? 1 : 98;
+                
                 // 确定要排除的门（不能是奖品门和玩家选择的门）
                 const doorsToReveal = [];
                 
                 // 找到除了玩家选择门和奖品门之外的所有门
-                for (let i = 1; i <= 100; i++) {
+                for (let i = 1; i <= doorCount; i++) {
                     if (i !== gameState.playerFirstChoice && i !== gameState.prizeDoor) {
                         doorsToReveal.push(i);
                     }
                 }
                 
-                // 随机排除98扇门（留下玩家选择的门和奖品门）
-                // 如果玩家第一次就选对了，那么剩下的门就是随机一扇空门
+                // 随机选择要排除的门
+                shuffleArray(doorsToReveal);
+                const doorsToRemove = doorsToReveal.slice(0, revealCount);
+                
+                // 剩下的门
                 if (gameState.playerFirstChoice === gameState.prizeDoor) {
                     // 玩家选对了，随机选择一扇门作为剩下的门
-                    const otherDoors = doorsToReveal.filter(door => door !== gameState.prizeDoor);
-                    gameState.remainingDoor = otherDoors[Math.floor(Math.random() * otherDoors.length)];
+                    gameState.remainingDoor = doorsToReveal[revealCount];
                 } else {
                     // 玩家选错了，剩下的门就是奖品门
                     gameState.remainingDoor = gameState.prizeDoor;
                 }
-                
-                // 排除98扇门：除了玩家选择的门和剩下的门
-                const doorsToRemove = [];
-                for (let i = 1; i <= 100; i++) {
-                    if (i !== gameState.playerFirstChoice && i !== gameState.remainingDoor) {
-                        doorsToRemove.push(i);
-                    }
-                }
-                
-                // 随机打乱顺序后显示排除过程
-                shuffleArray(doorsToRemove);
                 
                 // 动画显示排除的门
                 let delay = 0;
@@ -620,10 +718,8 @@
                         }
                     }, delay);
                     
-                    // 每10扇门增加一点延迟，制造动画效果
-                    if ((index + 1) % 10 === 0) {
-                        delay += 50;
-                    }
+                    // 增加一点延迟，制造动画效果
+                    delay += gameState.mode === 'three' ? 300 : 10;
                 });
             }
             
@@ -643,6 +739,7 @@
                 });
                 
                 // 确定最终选择
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
                 const finalChoice = swap ? gameState.remainingDoor : gameState.playerFirstChoice;
                 const isWinner = finalChoice === gameState.prizeDoor;
                 
@@ -702,26 +799,66 @@
                 swapWinRateEl.textContent = `${swapWinRate}%`;
             }
             
-            // 标签页切换
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    // 移除所有active类
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    
-                    // 添加active类到当前标签
-                    tab.classList.add('active');
-                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
-                });
-            });
+            // 更新概率显示
+            function updateProbabilityDisplay() {
+                if (gameState.mode === 'three') {
+                    initialProb.textContent = "33.3%";
+                    keepProb.textContent = "33.3%";
+                    swapProb.textContent = "66.7%";
+                    initialDesc.textContent = "你选中有奖品的概率是1/3";
+                    keepDesc.textContent = "获胜概率保持1/3不变";
+                    swapDesc.textContent = "获胜概率提高到2/3";
+                } else {
+                    initialProb.textContent = "1%";
+                    keepProb.textContent = "1%";
+                    swapProb.textContent = "99%";
+                    initialDesc.textContent = "你选中有奖品的概率是1/100";
+                    keepDesc.textContent = "获胜概率保持1/100不变";
+                    swapDesc.textContent = "获胜概率提高到99/100";
+                }
+            }
+            
+            // 切换模式
+            function switchMode(mode) {
+                gameState.mode = mode;
+                gameState.totalGames = 0;
+                gameState.keepWins = 0;
+                gameState.swapWins = 0;
+                
+                // 更新按钮状态
+                threeDoorsBtn.classList.toggle('active', mode === 'three');
+                hundredDoorsBtn.classList.toggle('active', mode === 'hundred');
+                
+                // 更新模式描述
+                if (mode === 'three') {
+                    modeDescription.innerHTML = '<h3><i class="fas fa-info-circle"></i> 三门问题模式</h3><p>经典的三门问题：3扇门中只有1扇有奖品。选择一扇门后，主持人打开一扇空门，然后您决定是否更换选择。</p>';
+                    doorCountEl.textContent = '3扇门中只有1扇门后面有奖品';
+                    revealCountEl.textContent = '主持人会打开1扇没有奖品的门';
+                    modeStats.textContent = '当前模式: 三门问题';
+                } else {
+                    modeDescription.innerHTML = '<h3><i class="fas fa-info-circle"></i> 百门问题模式</h3><p>扩展的百门问题：100扇门中只有1扇有奖品。选择一扇门后，主持人打开98扇空门，然后您决定是否更换选择。</p>';
+                    doorCountEl.textContent = '100扇门中只有1扇门后面有奖品';
+                    revealCountEl.textContent = '主持人会打开98扇没有奖品的门';
+                    modeStats.textContent = '当前模式: 百门问题';
+                }
+                
+                // 更新统计显示
+                updateStatsDisplay();
+                updateProbabilityDisplay();
+                
+                // 初始化新游戏
+                initGame();
+            }
             
             // 事件监听器
             resetBtn.addEventListener('click', initGame);
             keepBtn.addEventListener('click', () => makeFinalChoice(false));
             swapBtn.addEventListener('click', () => makeFinalChoice(true));
+            threeDoorsBtn.addEventListener('click', () => switchMode('three'));
+            hundredDoorsBtn.addEventListener('click', () => switchMode('hundred'));
             
             // 初始化游戏
-            initGame();
+            switchMode('three');
         });
     </script>
 </body>
