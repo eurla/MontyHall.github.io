@@ -214,6 +214,10 @@
             background: linear-gradient(to right, #e94057, #f27121);
         }
         
+        #revealAllBtn {
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+        }
+        
         .stats-container {
             display: flex;
             justify-content: space-around;
@@ -333,6 +337,20 @@
             font-weight: bold;
             color: #ffcc00;
             margin: 15px 0;
+        }
+        
+        .myth-busting {
+            background: rgba(255, 204, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #ffcc00;
+            text-align: left;
+        }
+        
+        .myth-busting h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
         }
         
         @media (max-width: 768px) {
@@ -458,6 +476,7 @@
         
         <div class="controls">
             <button id="resetBtn"><i class="fas fa-redo"></i> 重新开始游戏</button>
+            <button id="revealAllBtn"><i class="fas fa-eye"></i> 查看所有门后情况</button>
             <button id="keepBtn" disabled><i class="fas fa-lock"></i> 坚持原选择</button>
             <button id="swapBtn" disabled><i class="fas fa-exchange-alt"></i> 换成另一扇门</button>
         </div>
@@ -491,6 +510,16 @@
         
         <div class="probability-info">
             <h2><i class="fas fa-calculator"></i> 概率分析</h2>
+            
+            <div class="myth-busting">
+                <h3><i class="fas fa-exclamation-circle"></i> 为什么不是50%？</h3>
+                <p>很多人认为"最后只剩两扇门，所以概率各是50%"，这是一个常见误区。关键区别在于：</p>
+                <ul>
+                    <li>主持人<span class="highlight">知道奖品在哪里</span>，并且<em>永远只会打开空门</em></li>
+                    <li>第一次选择和第二次选择<em>不是独立的</em>，主持人的行为传递了信息</li>
+                    <li>你可以点击"查看所有门后情况"按钮，直观看到奖品从一开始就固定在某个位置</li>
+                </ul>
+            </div>
             
             <div class="probability-cards">
                 <div class="card">
@@ -558,16 +587,16 @@
             </table>
             
             <p style="margin-top: 25px; text-align: left; line-height: 1.6;">
-                <strong>为什么换门的胜率更高？</strong><br>
-                当你最初选择一扇门时，只有很小的机会是正确的（三门问题1/3，百门问题1/100）。
-                当主持人排除空门后，剩下的那扇门就包含了最初所有未被选择的门的概率。
-                换门策略相当于选择了最初未被选择的门的集合，而坚持原选择只选择了最初的那一扇门。
+                <strong>用百门问题理解更简单：</strong><br>
+                想象100扇门，你选1号门（1%概率正确）。主持人打开98扇空门，只留下1号门和37号门没开。<br>
+                你觉得奖品更可能在你最初随机选的1号门（1%概率），还是在主持人特意留下的37号门里（99%概率）？<br>
+                点击"查看所有门后情况"按钮，你会看到奖品从一开始就固定在某个位置，主持人只是排除了其他空门。
             </p>
         </div>
         
         <div class="footer">
             <p>三门问题与百门问题模拟器 | 设计用于演示概率论原理</p>
-            <p>© 2023 概率教育工具</p>
+            <p>© 2023 概率教育工具 | 可直接部署在任何托管服务上</p>
         </div>
     </div>
 
@@ -577,6 +606,7 @@
             const resetBtn = document.getElementById('resetBtn');
             const keepBtn = document.getElementById('keepBtn');
             const swapBtn = document.getElementById('swapBtn');
+            const revealAllBtn = document.getElementById('revealAllBtn'); // 新增按钮
             const resultDiv = document.getElementById('result');
             const prizeDoorInfo = document.getElementById('prizeDoorInfo');
             const playerChoiceInfo = document.getElementById('playerChoiceInfo');
@@ -611,7 +641,8 @@
                 prizeDoor: 0,
                 playerFirstChoice: null,
                 revealedDoors: [],
-                remainingDoor: null
+                remainingDoor: null,
+                isRevealedAll: false // 新增状态：是否已显示所有门
             };
             
             // 初始化游戏
@@ -622,6 +653,7 @@
                 gameState.playerFirstChoice = null;
                 gameState.revealedDoors = [];
                 gameState.remainingDoor = null;
+                gameState.isRevealedAll = false; // 重置显示状态
                 
                 // 更新界面
                 prizeDoorInfo.textContent = `奖品门: ?`;
@@ -721,6 +753,68 @@
                     // 增加一点延迟，制造动画效果
                     delay += gameState.mode === 'three' ? 300 : 10;
                 });
+            }
+            
+            // 新增功能：显示所有门后情况
+            function revealAllDoors() {
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
+                
+                // 如果已经显示过，就恢复原状
+                if (gameState.isRevealedAll) {
+                    resetDoorVisuals();
+                    gameState.isRevealedAll = false;
+                    revealAllBtn.innerHTML = '<i class="fas fa-eye"></i> 查看所有门后情况';
+                    return;
+                }
+                
+                // 显示所有门的实际情况
+                for (let i = 1; i <= doorCount; i++) {
+                    const doorEl = document.querySelector(`.door[data-id="${i}"]`);
+                    if (doorEl) {
+                        // 清除之前的样式
+                        doorEl.className = 'door';
+                        
+                        // 根据实际情况添加样式
+                        if (i === gameState.prizeDoor) {
+                            doorEl.classList.add('prize');
+                        } else {
+                            doorEl.classList.add('revealed');
+                        }
+                        
+                        // 如果是玩家选择的门，保留选中样式
+                        if (i === gameState.playerFirstChoice) {
+                            doorEl.classList.add('selected');
+                        }
+                    }
+                }
+                
+                // 显示奖品门信息
+                prizeDoorInfo.textContent = `奖品门: ${gameState.prizeDoor}`;
+                gameState.isRevealedAll = true;
+                revealAllBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏门后情况';
+            }
+            
+            // 重置门的视觉效果
+            function resetDoorVisuals() {
+                const doorCount = gameState.mode === 'three' ? 3 : 100;
+                
+                document.querySelectorAll('.door').forEach(door => {
+                    const doorId = parseInt(door.dataset.id);
+                    door.className = 'door';
+                    
+                    // 恢复选中状态
+                    if (doorId === gameState.playerFirstChoice) {
+                        door.classList.add('selected');
+                    }
+                    
+                    // 恢复已揭示的空门
+                    if (gameState.revealedDoors.includes(doorId)) {
+                        door.classList.add('revealed');
+                    }
+                });
+                
+                // 隐藏奖品门信息
+                prizeDoorInfo.textContent = `奖品门: ?`;
             }
             
             // 洗牌算法
@@ -824,6 +918,7 @@
                 gameState.totalGames = 0;
                 gameState.keepWins = 0;
                 gameState.swapWins = 0;
+                gameState.isRevealedAll = false; // 重置显示状态
                 
                 // 更新按钮状态
                 threeDoorsBtn.classList.toggle('active', mode === 'three');
@@ -856,6 +951,7 @@
             swapBtn.addEventListener('click', () => makeFinalChoice(true));
             threeDoorsBtn.addEventListener('click', () => switchMode('three'));
             hundredDoorsBtn.addEventListener('click', () => switchMode('hundred'));
+            revealAllBtn.addEventListener('click', revealAllDoors); // 新增按钮事件
             
             // 初始化游戏
             switchMode('three');
