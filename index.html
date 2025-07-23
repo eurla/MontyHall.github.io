@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100扇门问题模拟器 - 三门问题极端版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4e54c8;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ffcc00;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #4e54c8;
+        }
+        
+        .instructions {
+            background: rgba(30, 30, 60, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #ffcc00;
+        }
+        
+        .instructions h2 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .instructions ul {
+            padding-left: 25px;
+            line-height: 1.6;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .doors-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 12px;
+            margin: 30px 0;
+        }
+        
+        .door {
+            aspect-ratio: 3/4;
+            background: linear-gradient(to bottom, #8a2387, #e94057, #f27121);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .door:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .door.selected {
+            background: linear-gradient(to bottom, #00b09b, #96c93d);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.7);
+        }
+        
+        .door.revealed {
+            background: linear-gradient(to bottom, #4b6cb7, #182848);
+            opacity: 0.5;
+            cursor: default;
+        }
+        
+        .door.revealed::after {
+            content: "✖";
+            position: absolute;
+            font-size: 2.5rem;
+            color: rgba(255, 0, 0, 0.7);
+        }
+        
+        .door.prize {
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.8);
+        }
+        
+        .door.prize::after {
+            content: "🏆";
+            position: absolute;
+            font-size: 2.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        #swapBtn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+        
+        #keepBtn {
+            background: linear-gradient(to right, #e94057, #f27121);
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: rgba(30, 30, 60, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            min-width: 200px;
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 1.2rem;
+            color: #8f94fb;
+        }
+        
+        .result {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            font-size: 1.8rem;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(30, 30, 60, 0.8);
+        }
+        
+        .win {
+            background: rgba(0, 150, 100, 0.3);
+            color: #00ffaa;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .lose {
+            background: rgba(150, 0, 0, 0.3);
+            color: #ff5555;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 170, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 255, 170, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 170, 0); }
+        }
+        
+        .probability-info {
+            background: rgba(30, 30, 60, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            border-top: 3px solid #ffcc00;
+        }
+        
+        .highlight {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            padding: 0 10px;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+            padding: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .doors-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 8px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .stat-box {
+                min-width: 150px;
+            }
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4e54c8;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            background: rgba(78, 84, 200, 0.3);
+            border-radius: 8px 8px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: rgba(78, 84, 200, 0.8);
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .probability-cards {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: rgba(40, 40, 80, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            text-align: center;
+        }
+        
+        .card h3 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .card p {
+            line-height: 1.6;
+        }
+        
+        .card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-door-open"></i> 100扇门问题模拟器</h1>
+            <div class="subtitle">经典三门问题的极端扩展版本</div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="game">游戏</div>
+            <div class="tab" data-tab="explanation">概率解释</div>
+            <div class="tab" data-tab="about">关于</div>
+        </div>
+        
+        <div class="tab-content active" id="game-tab">
+            <div class="instructions">
+                <h2><i class="fas fa-info-circle"></i> 游戏规则</h2>
+                <ul>
+                    <li>100扇门中只有1扇门后面有奖品</li>
+                    <li>你首先选择一扇你认为有奖品的门</li>
+                    <li>主持人会打开98扇没有奖品的门，只留下你选择的门和另一扇门</li>
+                    <li>你需要决定：<span class="highlight">坚持原来的选择</span> 还是 <span class="highlight">换成另一扇门</span></li>
+                    <li>最后公布你是否中奖并更新统计数据</li>
+                </ul>
+            </div>
+            
+            <div class="game-info">
+                <div id="prizeDoorInfo"><i class="fas fa-gift"></i> 奖品门: ?</div>
+                <div id="playerChoiceInfo"><i class="fas fa-hand-pointer"></i> 你的选择: 未选择</div>
+            </div>
+            
+            <div class="doors-container" id="doors">
+                <!-- 100扇门将由JavaScript生成 -->
+            </div>
+            
+            <div class="controls">
+                <button id="resetBtn"><i class="fas fa-redo"></i> 重新开始游戏</button>
+                <button id="keepBtn" disabled><i class="fas fa-lock"></i> 坚持原选择</button>
+                <button id="swapBtn" disabled><i class="fas fa-exchange-alt"></i> 换成另一扇门</button>
+            </div>
+            
+            <div class="result" id="result">
+                请从上面100扇门中选择一扇开始游戏
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-value" id="totalGames">0</div>
+                    <div class="stat-label">总游戏次数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="keepWins">0</div>
+                    <div class="stat-label">坚持选择获胜</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="swapWins">0</div>
+                    <div class="stat-label">换门获胜</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="keepWinRate">0%</div>
+                    <div class="stat-label">坚持选择胜率</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="swapWinRate">0%</div>
+                    <div class="stat-label">换门胜率</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="explanation-tab">
+            <div class="probability-info">
+                <h2><i class="fas fa-calculator"></i> 概率分析</h2>
+                <p>这个游戏是著名的"三门问题"的扩展版本，它揭示了概率论中一个违反直觉的现象。</p>
+                
+                <div class="probability-cards">
+                    <div class="card">
+                        <h3>初始概率</h3>
+                        <p>当你最初选择一扇门时：</p>
+                        <div class="number">1%</div>
+                        <p>你选中有奖品的概率只有1%，因为总共有100扇门。</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>坚持选择</h3>
+                        <p>如果你坚持最初的选择：</p>
+                        <div class="number">1%</div>
+                        <p>获胜概率仍然是1%，因为主持人排除其他门不会改变你最初选择的概率。</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>换门</h3>
+                        <p>如果你选择换门：</p>
+                        <div class="number">99%</div>
+                        <p>获胜概率提高到99%，因为最初有99%的概率奖品在其他门中。</p>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 25px; text-align: left; line-height: 1.6;">
+                    <strong>为什么换门的胜率这么高？</strong><br>
+                    当你最初选择一扇门时，只有1%的机会是正确的，而有99%的机会奖品在其他99扇门中。
+                    当主持人排除98扇空门后，剩下的那扇门就包含了99%的概率。换门策略相当于选择了最初99扇门的集合，
+                    而坚持原选择只选择了最初的那一扇门。
+                </p>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="about-tab">
+            <div class="probability-info">
+                <h2><i class="fas fa-question-circle"></i> 关于100扇门问题</h2>
+                
+                <div style="text-align: left; line-height: 1.6; margin-top: 20px;">
+                    <p>这个游戏是著名的"蒙提霍尔问题"（Monty Hall problem）的扩展版本。蒙提霍尔问题得名于美国电视游戏节目《Let's Make a Deal》的主持人蒙提·霍尔。</p>
+                    
+                    <p><strong>历史背景：</strong></p>
+                    <p>这个问题最初由统计学家Steve Selvin在1975年提出，引起了广泛争议。1990年，一位读者向《Parade》杂志的"Ask Marilyn"专栏提出了这个问题，Marilyn vos Savant给出了换门的正确解答，但遭到了数千名读者的反对，其中包括许多数学教授。</p>
+                    
+                    <p><strong>数学原理：</strong></p>
+                    <p>100扇门问题通过放大规模使概率差异更加明显：</p>
+                    <ul style="padding-left: 25px; margin: 15px 0;">
+                        <li>初始选择正确的概率：1/100 = 1%</li>
+                        <li>初始选择错误的概率：99/100 = 99%</li>
+                        <li>换门后获胜的概率 = 初始选择错误的概率 = 99%</li>
+                    </ul>
+                    
+                    <p><strong>实际意义：</strong></p>
+                    <p>这个悖论展示了人类直觉在概率问题上的局限性，强调了条件概率的重要性。它在统计学、决策理论和人工智能领域都有应用价值。</p>
+                    
+                    <p style="margin-top: 20px; text-align: center; font-style: italic;">
+                        "概率不是直觉的产物，而是逻辑的产物。"<br>
+                        — 概率论先驱Pierre-Simon Laplace
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>100扇门问题模拟器 | 三门问题极端版 | 设计用于演示概率论原理</p>
+            <p>© 2023 概率教育工具</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const doorsContainer = document.getElementById('doors');
+            const resetBtn = document.getElementById('resetBtn');
+            const keepBtn = document.getElementById('keepBtn');
+            const swapBtn = document.getElementById('swapBtn');
+            const resultDiv = document.getElementById('result');
+            const prizeDoorInfo = document.getElementById('prizeDoorInfo');
+            const playerChoiceInfo = document.getElementById('playerChoiceInfo');
+            
+            // 统计元素
+            const totalGamesEl = document.getElementById('totalGames');
+            const keepWinsEl = document.getElementById('keepWins');
+            const swapWinsEl = document.getElementById('swapWins');
+            const keepWinRateEl = document.getElementById('keepWinRate');
+            const swapWinRateEl = document.getElementById('swapWinRate');
+            
+            // 标签页
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // 游戏状态
+            let gameState = {
+                totalGames: 0,
+                keepWins: 0,
+                swapWins: 0,
+                prizeDoor: 0,
+                playerFirstChoice: null,
+                doors: [],
+                revealedDoors: [],
+                remainingDoor: null
+            };
+            
+            // 初始化游戏
+            function initGame() {
+                // 重置游戏状态
+                gameState.prizeDoor = Math.floor(Math.random() * 100) + 1;
+                gameState.playerFirstChoice = null;
+                gameState.revealedDoors = [];
+                gameState.remainingDoor = null;
+                
+                // 更新界面
+                prizeDoorInfo.textContent = `奖品门: ?`;
+                playerChoiceInfo.textContent = `你的选择: 未选择`;
+                resultDiv.textContent = '请从上面100扇门中选择一扇开始游戏';
+                resultDiv.className = 'result';
+                
+                // 禁用操作按钮
+                keepBtn.disabled = true;
+                swapBtn.disabled = true;
+                
+                // 创建100扇门
+                doorsContainer.innerHTML = '';
+                for (let i = 1; i <= 100; i++) {
+                    const door = document.createElement('div');
+                    door.className = 'door';
+                    door.textContent = i;
+                    door.dataset.id = i;
+                    
+                    door.addEventListener('click', () => selectDoor(i));
+                    doorsContainer.appendChild(door);
+                }
+            }
+            
+            // 选择门
+            function selectDoor(doorId) {
+                if (gameState.playerFirstChoice !== null) return;
+                
+                gameState.playerFirstChoice = doorId;
+                playerChoiceInfo.textContent = `你的选择: ${doorId}`;
+                
+                // 标记选中的门
+                document.querySelectorAll('.door').forEach(door => {
+                    if (parseInt(door.dataset.id) === doorId) {
+                        door.classList.add('selected');
+                    }
+                });
+                
+                // 主持人操作：打开98扇没有奖品的门
+                revealEmptyDoors();
+                
+                // 启用操作按钮
+                keepBtn.disabled = false;
+                swapBtn.disabled = false;
+            }
+            
+            // 揭示空门
+            function revealEmptyDoors() {
+                // 确定要排除的门（不能是奖品门和玩家选择的门）
+                const doorsToReveal = [];
+                
+                // 找到除了玩家选择门和奖品门之外的所有门
+                for (let i = 1; i <= 100; i++) {
+                    if (i !== gameState.playerFirstChoice && i !== gameState.prizeDoor) {
+                        doorsToReveal.push(i);
+                    }
+                }
+                
+                // 随机排除98扇门（留下玩家选择的门和奖品门）
+                // 如果玩家第一次就选对了，那么剩下的门就是随机一扇空门
+                if (gameState.playerFirstChoice === gameState.prizeDoor) {
+                    // 玩家选对了，随机选择一扇门作为剩下的门
+                    const otherDoors = doorsToReveal.filter(door => door !== gameState.prizeDoor);
+                    gameState.remainingDoor = otherDoors[Math.floor(Math.random() * otherDoors.length)];
+                } else {
+                    // 玩家选错了，剩下的门就是奖品门
+                    gameState.remainingDoor = gameState.prizeDoor;
+                }
+                
+                // 排除98扇门：除了玩家选择的门和剩下的门
+                const doorsToRemove = [];
+                for (let i = 1; i <= 100; i++) {
+                    if (i !== gameState.playerFirstChoice && i !== gameState.remainingDoor) {
+                        doorsToRemove.push(i);
+                    }
+                }
+                
+                // 随机打乱顺序后显示排除过程
+                shuffleArray(doorsToRemove);
+                
+                // 动画显示排除的门
+                let delay = 0;
+                doorsToRemove.forEach((doorId, index) => {
+                    setTimeout(() => {
+                        const doorEl = document.querySelector(`.door[data-id="${doorId}"]`);
+                        if (doorEl) {
+                            doorEl.classList.add('revealed');
+                            gameState.revealedDoors.push(doorId);
+                        }
+                    }, delay);
+                    
+                    // 每10扇门增加一点延迟，制造动画效果
+                    if ((index + 1) % 10 === 0) {
+                        delay += 50;
+                    }
+                });
+            }
+            
+            // 洗牌算法
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+            
+            // 做出最终选择
+            function makeFinalChoice(swap) {
+                // 禁用所有门点击
+                document.querySelectorAll('.door').forEach(door => {
+                    door.style.cursor = 'default';
+                });
+                
+                // 确定最终选择
+                const finalChoice = swap ? gameState.remainingDoor : gameState.playerFirstChoice;
+                const isWinner = finalChoice === gameState.prizeDoor;
+                
+                // 显示奖品门
+                const prizeDoorEl = document.querySelector(`.door[data-id="${gameState.prizeDoor}"]`);
+                if (prizeDoorEl) {
+                    prizeDoorEl.classList.add('prize');
+                }
+                
+                // 显示最终选择
+                const finalChoiceEl = document.querySelector(`.door[data-id="${finalChoice}"]`);
+                if (finalChoiceEl) {
+                    finalChoiceEl.style.transform = 'scale(1.1)';
+                    finalChoiceEl.style.boxShadow = '0 0 25px #ffcc00';
+                }
+                
+                // 更新游戏统计
+                gameState.totalGames++;
+                
+                if (isWinner) {
+                    if (swap) {
+                        gameState.swapWins++;
+                    } else {
+                        gameState.keepWins++;
+                    }
+                    
+                    resultDiv.innerHTML = `恭喜！你${swap ? '换门' : '坚持'}选择正确，<i class="fas fa-trophy"></i> 赢得了奖品！`;
+                    resultDiv.className = 'result win';
+                } else {
+                    resultDiv.innerHTML = `很遗憾！你${swap ? '换门' : '坚持'}的选择错了，<i class="fas fa-gift"></i> 奖品在${gameState.prizeDoor}号门后面。`;
+                    resultDiv.className = 'result lose';
+                }
+                
+                // 更新统计显示
+                updateStatsDisplay();
+                
+                // 显示奖品门信息
+                prizeDoorInfo.textContent = `奖品门: ${gameState.prizeDoor}`;
+                
+                // 禁用操作按钮
+                keepBtn.disabled = true;
+                swapBtn.disabled = true;
+            }
+            
+            // 更新统计显示
+            function updateStatsDisplay() {
+                totalGamesEl.textContent = gameState.totalGames;
+                keepWinsEl.textContent = gameState.keepWins;
+                swapWinsEl.textContent = gameState.swapWins;
+                
+                const keepWinRate = gameState.keepWins > 0 ? 
+                    Math.round((gameState.keepWins / gameState.totalGames) * 100) : 0;
+                const swapWinRate = gameState.swapWins > 0 ? 
+                    Math.round((gameState.swapWins / gameState.totalGames) * 100) : 0;
+                
+                keepWinRateEl.textContent = `${keepWinRate}%`;
+                swapWinRateEl.textContent = `${swapWinRate}%`;
+            }
+            
+            // 标签页切换
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active类
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    // 添加active类到当前标签
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+                });
+            });
+            
+            // 事件监听器
+            resetBtn.addEventListener('click', initGame);
+            keepBtn.addEventListener('click', () => makeFinalChoice(false));
+            swapBtn.addEventListener('click', () => makeFinalChoice(true));
+            
+            // 初始化游戏
+            initGame();
+        });
+    </script>
+</body>
+</html>
